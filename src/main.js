@@ -13,6 +13,7 @@ import 'video.js/dist/video-js.css'
 
 
 import "../src/assets/css/_reset.scss"
+import store from './store'
 Video.addLanguage('zh-CN', video_zhCN);
 Video.addLanguage('en', video_en);
 Vue.prototype.$video = Video;
@@ -26,6 +27,7 @@ Vue.config.productionTip = false
   document.body.appendChild(rem)
 })()
 new Vue({
-  render: h => h(App),
+  store,
+  render: h => h(App)
 }).$mount('#app')
 

@@ -11,7 +11,7 @@
                  >
                
     </video-player>-->
-
+    <!-- 视频控制器 -->
     <div ref="controls" id="kjx-controls">
       <div id="play-pause-button" @click="playPauseButton()">
         <i class="iconfont" v-bind:class="{'icon-weibiaoti--1':!isPlay,'icon-weibiaoti--':isPlay}"></i>
@@ -32,15 +32,26 @@
         ></i>
       </div>
     </div>
+
+    <!-- 答题弹窗 -->
+    <div id="alert" v-if="showAlert.choice||showAlert.question">
+      <div id="mask"></div>
+      <choice v-if="showAlert.choice"></choice>
+      <question v-if="showAlert.question"></question>
+    </div>
   </div>
 </template>
 
 <script>
 import DotCon from "./DotCon/DotCon";
+import Choice from "./Alert/Choice"
+import Question from "./Alert/Question"
 export default {
   name: "MainVideo",
   components: {
-    DotCon
+    DotCon,
+    Choice,
+    Question
   },
   data() {
     return {
@@ -52,18 +63,43 @@ export default {
       duringBar: null,
       dotArray: [
         {
-          time: 200
+          time:5,
+          alertContent:{
+            type:'choice'
+          }
         },
         {
-          time: 150
+          time: 200,
+          alertContent:{
+            type:'question'
+          }
+        },
+        {
+          time: 150,
+          alertContent:{
+            type:'choice'
+          }
         }
-      ]
+      ],
+      timeArray:[],
+      // 是否显示
+      showAlert:{
+        choice:false,
+        question:false
+      }
     };
   },
+
   mounted() {
     let video = this.$refs.video,
       that = this;
+    
     that.duringBar = that.$refs.duringBar;
+
+    for(let i=0;i<that.dotArray.length;i++){
+      that.timeArray.push({time:that.dotArray[i].time,viewed:false})
+    }
+    console.log(that.timeArray)
     video.addEventListener("loadedmetadata", () => {
       that.duration = video.duration;
     });
@@ -75,6 +111,22 @@ export default {
         100}%`;
       if (that.currentTime >= that.duration) {
         that.isPlay = false;
+      }
+      // 监听dot
+      // console.log(video.currentTime)
+      if(that.timeArray.some((value)=>{
+        let time = Math.round(video.currentTime)
+        let index = that.timeArray.findIndex((e)=>{console.log(`${e.time} ${time}`)
+         return e.time==time})
+        console.log(time+" "+index)
+        if(Math.abs(value.time-video.currentTime)<0.2&&that.timeArray[index].viewed ==false){
+          return true
+        }
+      })){
+        let time = Math.round(video.currentTime)
+        let index = that.timeArray.findIndex((e)=>{return e.time==time})
+        that.timeArray[index].viewed = true
+        that.pauseToShowAlert(index)
       }
     });
   },
@@ -90,6 +142,28 @@ export default {
         // this.$refs.controls.style = "position:fixed;top:2.25rem;"
       }
       this.isPlay = !this.isPlay;
+    },
+    pauseToShowAlert(index){
+        this.$refs.video.pause();
+        this.isPlay = false
+
+        // 出现提示框
+        // alert('index:'+index)
+        let info = this.dotArray[index]
+        switch (info.alertContent.type) {
+          case 'choice':
+            this.showAlert.choice = true
+            break;
+          case 'question':
+            this.showAlert.question = true
+            break;
+          default:
+            break;
+        }
+    },
+    playButton(){
+      this.$refs.video.play()
+      this.isPlay=true
     },
     fullScreenButton() {
       if (this.isFullScreen) {
@@ -164,8 +238,11 @@ export default {
       console.log(currentTime)
        this.$refs.video.currentTime = currentTime
       console.log(this.$refs.video.currentTime);
-       this.$refs.video.play(); //防止因为结束后造成暂停状态
+      //  this.$refs.video.play(); //防止因为结束后造成暂停状态
       this.isPlay = true;
+
+      // 暂停出现对话框
+      this.pauseToShowAlert()
     }
   },
 
@@ -193,7 +270,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang="scss">
 #video-container {
   position: relative;
   width: 100%;
@@ -235,7 +312,7 @@ export default {
 #during-bar {
   position: absolute;
   height: 100%;
-  width: 10rem;
+  width: 0rem;
   background-color: rgb(66, 190, 248);
   border-radius: 0.1rem 0 0 0.1rem;
 }
@@ -284,5 +361,19 @@ export default {
 .iconfont:before {
   width: 100%;
   height: 100%;
+}
+
+
+/* alert */
+#alert{
+  width:18.75rem;
+  height:15.625rem;
+  background-color: #fff;
+  position: absolute;
+  top:50%;
+  left:50%;
+  margin-left: -9.375rem;
+  margin-top: -7.8125rem;
+  border-radius: 1rem;
 }
 </style>
