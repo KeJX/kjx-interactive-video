@@ -1,6 +1,6 @@
 <template>
     <div class="question-alert">
-        22222
+        2222222
     </div>
 </template>
 

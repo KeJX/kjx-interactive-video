@@ -18,7 +18,11 @@
       </div>
       <div id="progress-bar" ref="progressBar" @click="progressClick">
         <div id="base-bar">
-          <dot-con :duration="duration" :dotArray="dotArray" @dotClickCallback="dotClickInProgress"></dot-con>
+          <dot-con
+            :duration="duration"
+            :dotArray="$store.state.dotArray"
+            @dotClickCallback="dotClickInProgress"
+          ></dot-con>
           <div id="during-bar" ref="duringBar">
             <div id="during-dot"></div>
           </div>
@@ -33,19 +37,26 @@
       </div>
     </div>
 
-    <!-- 答题弹窗 -->
-    <div id="alert" v-if="showAlert.choice||showAlert.question">
-      <div id="mask"></div>
-      <choice v-if="showAlert.choice"></choice>
-      <question v-if="showAlert.question"></question>
-    </div>
+    <transition name="alert">
+      <!-- 答题弹窗 -->
+      <div id="alert" v-if="isShowAlert" @click="reset">
+        <choice v-if="this.$store.state.showAlert.choice"></choice>
+        <question v-if="this.$store.state.showAlert.question"></question>
+      </div>
+      
+    </transition>
+
+    <transition name="alert">
+    <!-- 遮罩 -->
+      <div id="mask" v-if="isShowAlert"></div>
+    </transition>
   </div>
 </template>
 
 <script>
 import DotCon from "./DotCon/DotCon";
-import Choice from "./Alert/Choice"
-import Question from "./Alert/Question"
+import Choice from "./Alert/Choice";
+import Question from "./Alert/Question";
 export default {
   name: "MainVideo",
   components: {
@@ -61,45 +72,33 @@ export default {
       duration: 0,
       currentTime: 0,
       duringBar: null,
-      dotArray: [
-        {
-          time:5,
-          alertContent:{
-            type:'choice'
-          }
-        },
-        {
-          time: 200,
-          alertContent:{
-            type:'question'
-          }
-        },
-        {
-          time: 150,
-          alertContent:{
-            type:'choice'
-          }
-        }
-      ],
-      timeArray:[],
-      // 是否显示
-      showAlert:{
-        choice:false,
-        question:false
-      }
+
+      timeArray: []
     };
   },
+  computed: {
+    isShowAlert() {
+      return (
+        this.$store.state.showAlert.choice ||
+        this.$store.state.showAlert.question
+      );
+    }
+  },
+  watch: {},
 
   mounted() {
     let video = this.$refs.video,
       that = this;
-    
+
     that.duringBar = that.$refs.duringBar;
 
-    for(let i=0;i<that.dotArray.length;i++){
-      that.timeArray.push({time:that.dotArray[i].time,viewed:false})
+    for (let i = 0; i < that.$store.state.dotArray.length; i++) {
+      that.timeArray.push({
+        time: that.$store.state.dotArray[i].time,
+        viewed: false
+      });
     }
-    console.log(that.timeArray)
+    console.log(that.timeArray);
     video.addEventListener("loadedmetadata", () => {
       that.duration = video.duration;
     });
@@ -114,19 +113,28 @@ export default {
       }
       // 监听dot
       // console.log(video.currentTime)
-      if(that.timeArray.some((value)=>{
-        let time = Math.round(video.currentTime)
-        let index = that.timeArray.findIndex((e)=>{console.log(`${e.time} ${time}`)
-         return e.time==time})
-        console.log(time+" "+index)
-        if(Math.abs(value.time-video.currentTime)<0.2&&that.timeArray[index].viewed ==false){
-          return true
-        }
-      })){
-        let time = Math.round(video.currentTime)
-        let index = that.timeArray.findIndex((e)=>{return e.time==time})
-        that.timeArray[index].viewed = true
-        that.pauseToShowAlert(index)
+      if (
+        that.timeArray.some(value => {
+          let time = Math.round(video.currentTime);
+          let index = that.timeArray.findIndex(e => {
+            console.log(`${e.time} ${time}`);
+            return e.time == time;
+          });
+          console.log(time + " " + index);
+          if (
+            Math.abs(value.time - video.currentTime) < 0.2 &&
+            that.timeArray[index].viewed == false
+          ) {
+            return true;
+          }
+        })
+      ) {
+        let time = Math.round(video.currentTime);
+        let index = that.timeArray.findIndex(e => {
+          return e.time == time;
+        });
+        that.timeArray[index].viewed = true;
+        that.pauseToShowAlert(index);
       }
     });
   },
@@ -143,27 +151,28 @@ export default {
       }
       this.isPlay = !this.isPlay;
     },
-    pauseToShowAlert(index){
-        this.$refs.video.pause();
-        this.isPlay = false
+    pauseToShowAlert(index) {
+      this.$refs.video.pause();
+      this.isPlay = false;
 
-        // 出现提示框
-        // alert('index:'+index)
-        let info = this.dotArray[index]
-        switch (info.alertContent.type) {
-          case 'choice':
-            this.showAlert.choice = true
-            break;
-          case 'question':
-            this.showAlert.question = true
-            break;
-          default:
-            break;
-        }
+      // 出现提示框
+      // alert('index:'+index)
+      let info = this.$store.state.dotArray[index];
+      switch (info.alertContent.type) {
+        case "choice":
+          // this.$store.state.showAlert.choice = true
+          this.$store.commit("show", "choice");
+          break;
+        case "question":
+          this.$store.commit("show", "question");
+          break;
+        default:
+          break;
+      }
     },
-    playButton(){
-      this.$refs.video.play()
-      this.isPlay=true
+    playButton() {
+      this.$refs.video.play();
+      this.isPlay = true;
     },
     fullScreenButton() {
       if (this.isFullScreen) {
@@ -234,15 +243,19 @@ export default {
         this.isPlay = true;
       }
     },
-    dotClickInProgress(currentTime){
-      console.log(currentTime)
-       this.$refs.video.currentTime = currentTime
+    dotClickInProgress(currentTime) {
+      console.log(currentTime);
+      this.$refs.video.currentTime = currentTime;
       console.log(this.$refs.video.currentTime);
       //  this.$refs.video.play(); //防止因为结束后造成暂停状态
       this.isPlay = true;
 
       // 暂停出现对话框
-      this.pauseToShowAlert()
+      this.pauseToShowAlert();
+    },
+    reset() {
+      this.$store.commit("reset");
+      this.playButton();
     }
   },
 
@@ -274,6 +287,7 @@ export default {
 #video-container {
   position: relative;
   width: 100%;
+  height: 30rem;
   background: black;
 }
 #main-video {
@@ -281,7 +295,8 @@ export default {
   height: 25rem;
   position: relative;
   left: 50%;
-  transform: translate(-50%);
+  top: 15rem;
+  transform: translate(-50%, -12.5rem);
 }
 
 #kjx-controls {
@@ -363,17 +378,39 @@ export default {
   height: 100%;
 }
 
-
 /* alert */
-#alert{
-  width:18.75rem;
-  height:15.625rem;
+#alert {
+  width: 18.75rem;
+  height: 15.625rem;
   background-color: #fff;
   position: absolute;
-  top:50%;
-  left:50%;
+  top: 50%;
+  left: 50%;
   margin-left: -9.375rem;
   margin-top: -7.8125rem;
   border-radius: 1rem;
+  z-index: 20;
+}
+// mask
+#mask {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 19;
+}
+
+.alert-enter,
+.alert-leave-to {
+  opacity: 0;
+}
+.alert-leave,
+.alert-enter-to {
+  opacity: 1;
+}
+.alert-enter-active,
+.alert-leave-active {
+  transition: all 0.5s;
 }
 </style>
