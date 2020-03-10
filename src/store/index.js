@@ -9,25 +9,30 @@ export default new Vuex.Store({
       {
         time:1,
         alertContent:{
-          type:'choice'
+          type:'choice',
+          isAnswered:false
         }
       },
       {
-        time: 200,
+        time: 5,
         alertContent:{
-          type:'question'
+          type:'choice',
+          isAnswered:false
+
         }
       },
       {
         time: 150,
         alertContent:{
-          type:'choice'
+          type:'choice',
+          isAnswered:false
+
         }
       }
     ],
     // 是否显示
     showAlert:{
-      choice:true,
+      choice:false,
       question:false
     }
   },
@@ -39,6 +44,9 @@ export default new Vuex.Store({
     },
     show(state,type){
       state.showAlert[type] = true
+    },
+    changeIsAnswered(state,index){
+      state.dotArray[index].alertContent.isAnswered=true
     }
   },
   actions: {

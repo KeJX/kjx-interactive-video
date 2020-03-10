@@ -39,9 +39,9 @@
 
     <transition name="alert">
       <!-- 答题弹窗 -->
-      <div id="alert" v-if="isShowAlert" @click="reset">
-        <choice v-if="this.$store.state.showAlert.choice"></choice>
-        <question v-if="this.$store.state.showAlert.question"></question>
+      <div id="alert" v-if="isShowAlert">
+        <choice :index="alertIndex" v-if="this.$store.state.showAlert.choice"></choice>
+        <question :index="alertIndex" v-if="this.$store.state.showAlert.question"></question>
       </div>
       
     </transition>
@@ -50,6 +50,12 @@
     <!-- 遮罩 -->
       <div id="mask" v-if="isShowAlert"></div>
     </transition>
+
+    <!-- 继续按钮 -->
+    <transition name="alert" v-if="isShowAlert&&$store.state.dotArray[alertIndex].alertContent.isAnswered">
+      <div class="continue-button"  @click="reset">继续</div>
+    </transition>
+
   </div>
 </template>
 
@@ -72,8 +78,9 @@ export default {
       duration: 0,
       currentTime: 0,
       duringBar: null,
-
-      timeArray: []
+      showContinue:false,
+      timeArray: [],
+      alertIndex:0
     };
   },
   computed: {
@@ -95,10 +102,10 @@ export default {
     for (let i = 0; i < that.$store.state.dotArray.length; i++) {
       that.timeArray.push({
         time: that.$store.state.dotArray[i].time,
-        viewed: false
+        viewed: false,
+        isAnswered:false
       });
     }
-    console.log(that.timeArray);
     video.addEventListener("loadedmetadata", () => {
       that.duration = video.duration;
     });
@@ -117,10 +124,10 @@ export default {
         that.timeArray.some(value => {
           let time = Math.round(video.currentTime);
           let index = that.timeArray.findIndex(e => {
-            console.log(`${e.time} ${time}`);
+            // console.log(`${e.time} ${time}`);
             return e.time == time;
           });
-          console.log(time + " " + index);
+          // console.log(time + " " + index);
           if (
             Math.abs(value.time - video.currentTime) < 0.2 &&
             that.timeArray[index].viewed == false
@@ -135,6 +142,10 @@ export default {
         });
         that.timeArray[index].viewed = true;
         that.pauseToShowAlert(index);
+        // 恢复浏览 
+        setTimeout(()=>{
+          that.timeArray[index].viewed = false
+        },.8)
       }
     });
   },
@@ -154,7 +165,7 @@ export default {
     pauseToShowAlert(index) {
       this.$refs.video.pause();
       this.isPlay = false;
-
+      this.alertIndex = index;
       // 出现提示框
       // alert('index:'+index)
       let info = this.$store.state.dotArray[index];
@@ -249,12 +260,21 @@ export default {
       console.log(this.$refs.video.currentTime);
       //  this.$refs.video.play(); //防止因为结束后造成暂停状态
       this.isPlay = true;
-
+      // 更新 alertIndex
+      let that = this
+      console.log(currentTime)
+      let index = this.timeArray.findIndex(e=>{
+        return e.time == currentTime
+      })
+    alert(index)
       // 暂停出现对话框
-      this.pauseToShowAlert();
+      this.pauseToShowAlert(index);
+
+
     },
     reset() {
       this.$store.commit("reset");
+      
       this.playButton();
     }
   },
@@ -287,16 +307,16 @@ export default {
 #video-container {
   position: relative;
   width: 100%;
-  height: 30rem;
+  height: 25rem;
   background: black;
 }
 #main-video {
   width: 80%;
-  height: 25rem;
+  height: 20rem;
   position: relative;
   left: 50%;
-  top: 15rem;
-  transform: translate(-50%, -12.5rem);
+  top: 12.5rem;
+  transform: translate(-50%, -10rem);
 }
 
 #kjx-controls {
@@ -380,16 +400,10 @@ export default {
 
 /* alert */
 #alert {
-  width: 18.75rem;
-  height: 15.625rem;
-  background-color: #fff;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-left: -9.375rem;
-  margin-top: -7.8125rem;
-  border-radius: 1rem;
-  z-index: 20;
+  width:100%;
+  height:100%;
+  position:absolute;
+  top:0;
 }
 // mask
 #mask {
@@ -413,4 +427,23 @@ export default {
 .alert-leave-active {
   transition: all 0.5s;
 }
+
+// 继续按钮
+.continue-button{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color:black;
+    position: absolute;
+    width:3rem;
+    height:2rem;
+    border-radius: .3rem;
+    bottom:3rem;
+    right: 1rem;
+    font-size: .8rem;
+    background-color: rgb(66, 190, 248);
+    color:white;
+    z-index: 20;
+    cursor: pointer;
+  }
 </style>
