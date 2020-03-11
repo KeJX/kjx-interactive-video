@@ -53,7 +53,7 @@
 
     <!-- 继续按钮 -->
     <transition name="alert" v-if="isShowAlert&&$store.state.dotArray[alertIndex].alertContent.isAnswered">
-      <div class="continue-button"  @click="reset">继续</div>
+      <div class="continue-button"  @click="reset(alertIndex)">继续</div>
     </transition>
 
   </div>
@@ -103,7 +103,6 @@ export default {
       that.timeArray.push({
         time: that.$store.state.dotArray[i].time,
         viewed: false,
-        isAnswered:false
       });
     }
     video.addEventListener("loadedmetadata", () => {
@@ -129,8 +128,8 @@ export default {
           });
           // console.log(time + " " + index);
           if (
-            Math.abs(value.time - video.currentTime) < 0.2 &&
-            that.timeArray[index].viewed == false
+            Math.abs(value.time - video.currentTime) < 0.15 &&
+            that.timeArray[index].viewed === false
           ) {
             return true;
           }
@@ -143,9 +142,9 @@ export default {
         that.timeArray[index].viewed = true;
         that.pauseToShowAlert(index);
         // 恢复浏览 
-        setTimeout(()=>{
-          that.timeArray[index].viewed = false
-        },.8)
+        // setTimeout(()=>{
+        //   that.timeArray[index].viewed = false
+        // },.8)
       }
     });
   },
@@ -266,15 +265,16 @@ export default {
       let index = this.timeArray.findIndex(e=>{
         return e.time == currentTime
       })
-    alert(index)
       // 暂停出现对话框
       this.pauseToShowAlert(index);
 
 
     },
-    reset() {
+    reset(index) {
       this.$store.commit("reset");
-      
+      setTimeout(() => {
+        this.timeArray[index].viewed = false
+      }, 1);
       this.playButton();
     }
   },

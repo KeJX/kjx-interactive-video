@@ -9,24 +9,30 @@ export default new Vuex.Store({
       {
         time:1,
         alertContent:{
-          type:'choice',
-          isAnswered:false
+          type:'question',
+          isAnswered:false,
+          finalAnswer:''
         }
       },
       {
         time: 5,
         alertContent:{
           type:'choice',
-          isAnswered:false
-
+          isAnswered:false,
+          list: ["做老八秘制汉堡", "做老9秘制汉堡", "做猪肚", "做猪肉"],
+          rightChoice:1,
+          finalChoice:-1,
+         
         }
       },
       {
         time: 150,
         alertContent:{
           type:'choice',
-          isAnswered:false
-
+          isAnswered:false,
+          list: ["做老八秘制汉堡", "做老9秘制汉堡", "做猪肚", "做猪肉"],
+          rightChoice:1,
+          finalChoice:-1,
         }
       }
     ],

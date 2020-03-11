@@ -5,30 +5,41 @@
         <span>单选题:</span>
       </div>
       <div class="content">请问我们做的是啥?</div>
-      <div class="choice-item" v-for="(item,i) in list" @click="clickFunc">
-        <strong>{{`${headList[i]}.`}}</strong>
-        <span>{{item}}</span>
+      <div class="choice-item" v-bind:class="{'correct':alertContent.isAnswered&&(i==alertContent.rightChoice),'wrong':alertContent.isAnswered&&(i==alertContent.finalChoice)&&(i!==alertContent.rightChoice)}" v-for="(item,i) in list" @click="clickFunc(i)" :key="i">
+        <span class="left"><strong>{{`${headList[i]}.`}}</strong>{{item}}</span>
+        <i v-if="alertContent.isAnswered&&(i==alertContent.rightChoice||i==alertContent.finalChoice)" class="iconfont  right" :class="{'icon-zhengque-':i==alertContent.rightChoice,'icon-cuowu-':(i==alertContent.finalChoice)&&(alertContent.finalChoice!==alertContent.rightChoice)}" ></i>
       </div>
     </div>
   </div>
 </template>
 <script>
 export default {
+  name:"Choice",
   data() {
     return {
       headList: ["A", "B", "C", "D"],
-      list: ["做老八秘制汉堡", "做老9秘制汉堡", "做猪肚", "做猪肉"],
-      rightChoice: 3
+      list:null,
+      rightChoice: 3,
+      alertContent:null
     };
   },
   props: {
       index:Number
   },
   methods:{
-      clickFunc(){
+      clickFunc(i){
+        if(this.$store.state.dotArray[this.index].alertContent.isAnswered){}
+        else{
           this.$store.commit("changeIsAnswered",this.index)
+          this.alertContent.finalChoice = i
+           this.alertContent=this.$store.state.dotArray[this.index].alertContent
+        }
       }
-  }
+  },
+  mounted() {
+    this.alertContent=this.$store.state.dotArray[this.index].alertContent
+    this.list = this.$store.state.dotArray[this.index].alertContent.list
+  },
 };
 </script>
 <style lang="scss">
@@ -72,6 +83,26 @@ export default {
   border-radius: 0.1rem;
   background-color: #fbf9fb;
   color: #47484c;
+  height:2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  .iconfont{
+    color: white;
+    width:1rem;
+    height:1rem;
+    font-size: 1rem;
+   
+  }
+  &.correct{
+    background-color: #1CC869;
+    color:white;
+  }
+
+  &.wrong{
+    background-color: #EC414D;
+    color:white;
+  }
 }
 
 .choice-item:hover {
@@ -80,4 +111,6 @@ export default {
   cursor: pointer;
   color: white;
 }
+
+
 </style>
