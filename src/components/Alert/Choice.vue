@@ -4,7 +4,7 @@
       <div class="title">
         <span>单选题:</span>
       </div>
-      <div class="content">请问我们做的是啥?</div>
+      <div class="content">{{alertContent.title}}</div>
       <div class="choice-item" v-bind:class="{'correct':alertContent.isAnswered&&(i==alertContent.rightChoice),'wrong':alertContent.isAnswered&&(i==alertContent.finalChoice)&&(i!==alertContent.rightChoice)}" v-for="(item,i) in list" @click="clickFunc(i)" :key="i">
         <span class="left"><strong>{{`${headList[i]}.`}}</strong>{{item}}</span>
         <i v-if="alertContent.isAnswered&&(i==alertContent.rightChoice||i==alertContent.finalChoice)" class="iconfont  right" :class="{'icon-zhengque-':i==alertContent.rightChoice,'icon-cuowu-':(i==alertContent.finalChoice)&&(alertContent.finalChoice!==alertContent.rightChoice)}" ></i>
@@ -19,7 +19,6 @@ export default {
     return {
       headList: ["A", "B", "C", "D"],
       list:null,
-      rightChoice: 3,
       alertContent:null
     };
   },
@@ -36,7 +35,7 @@ export default {
         }
       }
   },
-  mounted() {
+  created() {
     this.alertContent=this.$store.state.dotArray[this.index].alertContent
     this.list = this.$store.state.dotArray[this.index].alertContent.list
   },

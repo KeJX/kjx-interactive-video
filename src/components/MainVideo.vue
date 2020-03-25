@@ -1,8 +1,16 @@
 <template>
   <div ref="videoContainer" id="video-container">
-    <video ref="video" id="main-video">
+    <div>
+      <video ref="video" id="main-video">
       <source :src="`${publicPath}videos/test.mp4`" type="video/mp4" />
     </video>
+        <!-- 探索式的tip -->
+      <div class="tip-container">
+        <transition name="fade" v-if="isShowTip">
+          <tip :content="tipContent"></tip>
+        </transition>
+      </div>
+    </div>
     <!-- <video-player id="main-video"  class="video-player-box"
                  ref="videoPlayer"
                  :options="playerOptions"
@@ -56,6 +64,8 @@
       <div class="continue-button"  @click="reset(alertIndex)">继续</div>
     </transition>
 
+
+  
   </div>
 </template>
 
@@ -63,12 +73,14 @@
 import DotCon from "./DotCon/DotCon";
 import Choice from "./Alert/Choice";
 import Question from "./Alert/Question";
+import Tip from "./Tip/Tip"
 export default {
   name: "MainVideo",
   components: {
     DotCon,
     Choice,
-    Question
+    Question,
+    Tip
   },
   data() {
     return {
@@ -79,8 +91,13 @@ export default {
       currentTime: 0,
       duringBar: null,
       showContinue:false,
-      timeArray: [],
-      alertIndex:0
+      timeArray: [],//对视频进行打点
+      tipArray:[],//tip的时间
+      alertIndex:0,
+      // show Tip
+      isShowTip:false,
+      tipContent:"",
+      // danmu
     };
   },
   computed: {
@@ -92,19 +109,81 @@ export default {
     }
   },
   watch: {},
-
+  created(){
+   
+  },
   mounted() {
+     this.danmu = new this.$danmu({
+      container:this.$refs.videoContainer,
+      media:this.$refs.video,
+      comments:[],
+      engine:'canvas',
+      speed:144
+    })
+    this.danmu.emit({
+  text: 'example',
+
+  // 'rtl'(right to left) by default, available mode: 'ltr', 'rtl', 'top', 'bottom'.
+  mode: 'rtl',
+
+  // Specified in seconds, if not provided when using with media,
+  // it will be set to `media.currentTime`. Not required in live mode.
+  time: 10  ,
+
+  // When using DOM engine, Danmaku will create a <div> node for each comment,
+  // the style object will be set to `node.style` directly, just write with CSS rules.
+  // For example:
+  style: {
+    fontSize: '20px',
+    color: '#ffffff',
+    border: '1px solid #337ab7',
+    textShadow: '-1px -1px #000, -1px 1px #000, 1px -1px #000, 1px 1px #000'
+  },
+
+  // When using canvas engine, Danmaku will create a <canvas> object for each comment,
+  // you should pass in a CanvasRenderingContext2D object.
+  // For example:
+  style: {
+    font: '10px sans-serif',
+    textAlign: 'start',
+    // Note that 'bottom' is the default
+    textBaseline: 'bottom',
+    direction: 'inherit',
+    fillStyle: '#000',
+    strokeStyle: '#000',
+    lineWidth: 1.0,
+    // ...
+  },
+
+  // A custom render to draw comment.
+  // when `render` exist, `text` and `style` will be ignored.
+})
     let video = this.$refs.video,
       that = this;
 
     that.duringBar = that.$refs.duringBar;
 
+    // timeArray的填充
     for (let i = 0; i < that.$store.state.dotArray.length; i++) {
       that.timeArray.push({
         time: that.$store.state.dotArray[i].time,
         viewed: false,
       });
     }
+
+
+    //tipArray的填充
+    for(let i = 0;i<that.$store.state.tipArray.length;i++){
+      that.tipArray.push({
+        startTime:that.$store.state.tipArray[i].startTime,
+        endTime:that.$store.state.tipArray[i].endTime,
+        content:that.$store.state.tipArray[i].content
+      })
+    }
+
+
+
+
     video.addEventListener("loadedmetadata", () => {
       that.duration = video.duration;
     });
@@ -117,34 +196,56 @@ export default {
       if (that.currentTime >= that.duration) {
         that.isPlay = false;
       }
+
+
+          let time = Math.round(video.currentTime);
+
       // 监听dot
       // console.log(video.currentTime)
+      let timeIndex=-1;
       if (
         that.timeArray.some(value => {
-          let time = Math.round(video.currentTime);
-          let index = that.timeArray.findIndex(e => {
-            // console.log(`${e.time} ${time}`);
+          timeIndex = that.timeArray.findIndex(e => {
             return e.time == time;
           });
-          // console.log(time + " " + index);
+          console.log(timeIndex)
           if (
             Math.abs(value.time - video.currentTime) < 0.15 &&
-            that.timeArray[index].viewed === false
+            that.timeArray[timeIndex].viewed === false
           ) {
             return true;
           }
         })
       ) {
         let time = Math.round(video.currentTime);
-        let index = that.timeArray.findIndex(e => {
-          return e.time == time;
-        });
-        that.timeArray[index].viewed = true;
-        that.pauseToShowAlert(index);
+        // let index = that.timeArray.findIndex(e => {
+        //   return e.time == time;
+        // });
+        that.timeArray[timeIndex].viewed = true;
+        that.pauseToShowAlert(timeIndex);
         // 恢复浏览 
         // setTimeout(()=>{
         //   that.timeArray[index].viewed = false
         // },.8)
+        timeIndex=-1
+
+       
+      }
+
+      // 监听tip
+      let tipIndex = -1
+      if(
+        that.tipArray.some(value=>{
+          tipIndex = that.tipArray.findIndex(e=>{
+            return (time>e.startTime&&time<e.endTime)
+          })
+          return tipIndex >-1
+        })
+      ){
+        that.isShowTip = true
+        that.tipContent=that.tipArray[tipIndex].content
+      }else{
+        that.isShowTip = false
       }
     });
   },
@@ -445,5 +546,13 @@ export default {
     color:white;
     z-index: 20;
     cursor: pointer;
+  }
+
+  // tip-container
+  .tip-container{
+    z-index: 200;
+    position: absolute;
+    top:5rem;
+    left:3rem;
   }
 </style>

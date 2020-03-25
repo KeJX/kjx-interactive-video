@@ -19,5 +19,7 @@ export default {
 </script>
 
 <style>
-
+*{
+  font-family:'苹方';
+}
 </style>

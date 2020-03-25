@@ -6,41 +6,47 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     dotArray: [
-      {
-        time:1,
-        alertContent:{
-          type:'question',
-          isAnswered:false,
-          finalAnswer:''
-        }
-      },
+     
       {
         time: 5,
         alertContent:{
           type:'choice',
           isAnswered:false,
-          list: ["做老八秘制汉堡", "做老9秘制汉堡", "做猪肚", "做猪肉"],
+          title:"今天我们要做的菜名？",
+          list: ["香葱烧肚条", "大蒜烧肚条", "葱油猪肚", "大蒜炒肉条"],
           rightChoice:1,
           finalChoice:-1,
-         
         }
       },
       {
-        time: 150,
+        time:56,
         alertContent:{
-          type:'choice',
+          type:'question',
           isAnswered:false,
-          list: ["做老八秘制汉堡", "做老9秘制汉堡", "做猪肚", "做猪肉"],
-          rightChoice:1,
-          finalChoice:-1,
+          title:"回答出刚刚提到的三个注意点",
+          finalAnswer:''
         }
-      }
+      },
+      
     ],
-    // 是否显示
+    // 显示哪种弹窗
     showAlert:{
       choice:false,
       question:false
-    }
+    },
+    tipArray:[
+      {
+        startTime:1,
+        endTime:9,
+        content:"1-5"
+      },
+      {
+        startTime:10,
+        endTime:15,
+        content:"10-15"
+      }
+    ]
+
   },
   mutations: {
     reset(state){

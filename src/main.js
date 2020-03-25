@@ -14,11 +14,18 @@ import 'video.js/dist/video-js.css'
 
 import "../src/assets/css/_reset.scss"
 import store from './store'
+// 引入弹幕库
+
+import Danmaku from 'danmaku'
+
 Video.addLanguage('zh-CN', video_zhCN);
 Video.addLanguage('en', video_en);
 Vue.prototype.$video = Video;
+Vue.prototype.$danmu= Danmaku
 // 引入videojs-makers (打点用)
 // import   'videojs-markers'
+
+
 
 Vue.config.productionTip = false
 ;(function(){
