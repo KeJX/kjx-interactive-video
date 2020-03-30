@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
 
 // 引入video.js
 import Video from 'video.js'
@@ -17,6 +19,10 @@ import store from './store'
 // 引入弹幕库
 
 import Danmaku from 'danmaku'
+
+
+// element
+Vue.use(ElementUI);
 
 Video.addLanguage('zh-CN', video_zhCN);
 Video.addLanguage('en', video_en);

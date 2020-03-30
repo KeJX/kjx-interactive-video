@@ -1,24 +1,16 @@
 <template>
   <div ref="videoContainer" id="video-container">
-    <div>
+    <div ref="danmuContainer" id="danmu-container">
       <video ref="video" id="main-video">
-      <source :src="`${publicPath}videos/test.mp4`" type="video/mp4" />
-    </video>
-        <!-- 探索式的tip -->
+        <source :src="`${publicPath}videos/test.mp4`" type="video/mp4" />
+      </video>
+      <!-- 探索式的tip -->
       <div class="tip-container">
         <transition name="fade" v-if="isShowTip">
           <tip :content="tipContent"></tip>
         </transition>
       </div>
     </div>
-    <!-- <video-player id="main-video"  class="video-player-box"
-                 ref="videoPlayer"
-                 :options="playerOptions"
-                 :playsinline="true"
-                 customEventName="customstatechangedeventname"
-                 >
-               
-    </video-player>-->
     <!-- 视频控制器 -->
     <div ref="controls" id="kjx-controls">
       <div id="play-pause-button" @click="playPauseButton()">
@@ -45,27 +37,32 @@
       </div>
     </div>
 
-    <transition name="alert">
       <!-- 答题弹窗 -->
+    <transition name="alert">
       <div id="alert" v-if="isShowAlert">
         <choice :index="alertIndex" v-if="this.$store.state.showAlert.choice"></choice>
         <question :index="alertIndex" v-if="this.$store.state.showAlert.question"></question>
       </div>
-      
     </transition>
 
     <transition name="alert">
-    <!-- 遮罩 -->
+      <!-- 遮罩 -->
       <div id="mask" v-if="isShowAlert"></div>
     </transition>
 
     <!-- 继续按钮 -->
-    <transition name="alert" v-if="isShowAlert&&$store.state.dotArray[alertIndex].alertContent.isAnswered">
-      <div class="continue-button"  @click="reset(alertIndex)">继续</div>
+    <transition
+      name="alert"
+      v-if="isShowAlert&&$store.state.dotArray[alertIndex].alertContent.isAnswered"
+    >
+      <div class="continue-button" @click="reset(alertIndex)">继续</div>
     </transition>
 
-
-  
+    <!-- 弹幕shooter -->
+    <transition name="alert">
+    <danmu v-show="!isFullScreen" id="danmu":danmu="danmu" :video="$refs.video" ></danmu>
+    
+    </transition>
   </div>
 </template>
 
@@ -73,14 +70,16 @@
 import DotCon from "./DotCon/DotCon";
 import Choice from "./Alert/Choice";
 import Question from "./Alert/Question";
-import Tip from "./Tip/Tip"
+import Tip from "./Tip/Tip";
+import Danmu from "./Danmu/Danmu";
 export default {
   name: "MainVideo",
   components: {
     DotCon,
     Choice,
     Question,
-    Tip
+    Tip,
+    Danmu
   },
   data() {
     return {
@@ -90,14 +89,16 @@ export default {
       duration: 0,
       currentTime: 0,
       duringBar: null,
-      showContinue:false,
-      timeArray: [],//对视频进行打点
-      tipArray:[],//tip的时间
-      alertIndex:0,
+      showContinue: false,
+      timeArray: [], //对视频进行打点
+      tipArray: [], //tip的时间
+      alertIndex: 0,
       // show Tip
-      isShowTip:false,
-      tipContent:"",
+      isShowTip: false,
+      tipContent: "",
       // danmu
+      danmu:{},
+      danmuComments:[]
     };
   },
   computed: {
@@ -109,83 +110,47 @@ export default {
     }
   },
   watch: {},
-  created(){
-   
-  },
+  created() {},
   mounted() {
-     this.danmu = new this.$danmu({
-      container:this.$refs.videoContainer,
-      media:this.$refs.video,
-      comments:[],
-      engine:'canvas',
-      speed:144
-    })
-    this.danmu.emit({
-  text: 'example',
+    let that = this;
+    // 更新弹幕
+    this.danmuComments = this.$store.state.danmuConfig.comments
+    this.danmu = new this.$danmu({
+      container: this.$refs.videoContainer,
+      media: this.$refs.video,
+      comments: that.danmuComments,
+      engine: "canvas",
+      speed: 144
+    });
+    
+    let danmuCanvas = this.$refs.videoContainer.getElementsByTagName('canvas')[0]
+    danmuCanvas.style.transform="scale("+ .8 +")";
+    danmuCanvas.style.zIndex=3;
 
-  // 'rtl'(right to left) by default, available mode: 'ltr', 'rtl', 'top', 'bottom'.
-  mode: 'rtl',
+    let video = this.$refs.video
 
-  // Specified in seconds, if not provided when using with media,
-  // it will be set to `media.currentTime`. Not required in live mode.
-  time: 10  ,
-
-  // When using DOM engine, Danmaku will create a <div> node for each comment,
-  // the style object will be set to `node.style` directly, just write with CSS rules.
-  // For example:
-  style: {
-    fontSize: '20px',
-    color: '#ffffff',
-    border: '1px solid #337ab7',
-    textShadow: '-1px -1px #000, -1px 1px #000, 1px -1px #000, 1px 1px #000'
-  },
-
-  // When using canvas engine, Danmaku will create a <canvas> object for each comment,
-  // you should pass in a CanvasRenderingContext2D object.
-  // For example:
-  style: {
-    font: '10px sans-serif',
-    textAlign: 'start',
-    // Note that 'bottom' is the default
-    textBaseline: 'bottom',
-    direction: 'inherit',
-    fillStyle: '#000',
-    strokeStyle: '#000',
-    lineWidth: 1.0,
-    // ...
-  },
-
-  // A custom render to draw comment.
-  // when `render` exist, `text` and `style` will be ignored.
-})
-    let video = this.$refs.video,
-      that = this;
-
-    that.duringBar = that.$refs.duringBar;
+    that.duringBar = that.$refs.duringBar
 
     // timeArray的填充
     for (let i = 0; i < that.$store.state.dotArray.length; i++) {
       that.timeArray.push({
         time: that.$store.state.dotArray[i].time,
-        viewed: false,
+        viewed: false
       });
     }
 
-
     //tipArray的填充
-    for(let i = 0;i<that.$store.state.tipArray.length;i++){
+    for (let i = 0; i < that.$store.state.tipArray.length; i++) {
       that.tipArray.push({
-        startTime:that.$store.state.tipArray[i].startTime,
-        endTime:that.$store.state.tipArray[i].endTime,
-        content:that.$store.state.tipArray[i].content
-      })
+        startTime: that.$store.state.tipArray[i].startTime,
+        endTime: that.$store.state.tipArray[i].endTime,
+        content: that.$store.state.tipArray[i].content
+      });
     }
-
-
-
 
     video.addEventListener("loadedmetadata", () => {
       that.duration = video.duration;
+      that.danmu.resize()
     });
     video.addEventListener("timeupdate", () => {
       that.currentTime = video.currentTime;
@@ -197,18 +162,16 @@ export default {
         that.isPlay = false;
       }
 
-
-          let time = Math.round(video.currentTime);
+      let time = Math.round(video.currentTime);
 
       // 监听dot
       // console.log(video.currentTime)
-      let timeIndex=-1;
+      let timeIndex = -1;
       if (
         that.timeArray.some(value => {
           timeIndex = that.timeArray.findIndex(e => {
             return e.time == time;
           });
-          console.log(timeIndex)
           if (
             Math.abs(value.time - video.currentTime) < 0.15 &&
             that.timeArray[timeIndex].viewed === false
@@ -223,29 +186,27 @@ export default {
         // });
         that.timeArray[timeIndex].viewed = true;
         that.pauseToShowAlert(timeIndex);
-        // 恢复浏览 
+        // 恢复浏览
         // setTimeout(()=>{
         //   that.timeArray[index].viewed = false
         // },.8)
-        timeIndex=-1
-
-       
+        timeIndex = -1;
       }
 
       // 监听tip
-      let tipIndex = -1
-      if(
-        that.tipArray.some(value=>{
-          tipIndex = that.tipArray.findIndex(e=>{
-            return (time>e.startTime&&time<e.endTime)
-          })
-          return tipIndex >-1
+      let tipIndex = -1;
+      if (
+        that.tipArray.some(value => {
+          tipIndex = that.tipArray.findIndex(e => {
+            return time > e.startTime && time < e.endTime;
+          });
+          return tipIndex > -1;
         })
-      ){
-        that.isShowTip = true
-        that.tipContent=that.tipArray[tipIndex].content
-      }else{
-        that.isShowTip = false
+      ) {
+        that.isShowTip = true;
+        that.tipContent = that.tipArray[tipIndex].content;
+      } else {
+        that.isShowTip = false;
       }
     });
   },
@@ -290,11 +251,17 @@ export default {
         // 全屏  --> 缩小
         fullScreenOff(this.$refs.videoContainer);
         this.$refs.videoContainer.style = "";
+        // 弹幕resize
+        // this.danmu.resize()
+        console.log("im small")
       } else {
         // 不是全屏 --》 放大
         fullScreenOn(this.$refs.videoContainer);
         this.$refs.videoContainer.style =
           "display:flex;align-items=center;flex-direction:column;justify-content:center;";
+        this.danmu.resize()
+        console.log("im big")
+
       }
 
       this.isFullScreen = !this.isFullScreen;
@@ -355,26 +322,21 @@ export default {
       }
     },
     dotClickInProgress(currentTime) {
-      console.log(currentTime);
       this.$refs.video.currentTime = currentTime;
-      console.log(this.$refs.video.currentTime);
       //  this.$refs.video.play(); //防止因为结束后造成暂停状态
       this.isPlay = true;
       // 更新 alertIndex
-      let that = this
-      console.log(currentTime)
-      let index = this.timeArray.findIndex(e=>{
-        return e.time == currentTime
-      })
+      let that = this;
+      let index = this.timeArray.findIndex(e => {
+        return e.time == currentTime;
+      });
       // 暂停出现对话框
       this.pauseToShowAlert(index);
-
-
     },
     reset(index) {
       this.$store.commit("reset");
       setTimeout(() => {
-        this.timeArray[index].viewed = false
+        this.timeArray[index].viewed = false;
       }, 1);
       this.playButton();
     }
@@ -410,10 +372,11 @@ export default {
   width: 100%;
   height: 25rem;
   background: black;
+  // padding:0 .5rem;
 }
 #main-video {
   width: 80%;
-  height: 20rem;
+  height: 80%;
   position: relative;
   left: 50%;
   top: 12.5rem;
@@ -430,6 +393,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   bottom: 0;
+  z-index:3;
 }
 
 #progress-bar {
@@ -501,10 +465,10 @@ export default {
 
 /* alert */
 #alert {
-  width:100%;
-  height:100%;
-  position:absolute;
-  top:0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
 }
 // mask
 #mask {
@@ -530,29 +494,48 @@ export default {
 }
 
 // 继续按钮
-.continue-button{
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color:black;
-    position: absolute;
-    width:3rem;
-    height:2rem;
-    border-radius: .3rem;
-    bottom:3rem;
-    right: 1rem;
-    font-size: .8rem;
-    background-color: rgb(66, 190, 248);
-    color:white;
-    z-index: 20;
-    cursor: pointer;
-  }
+.continue-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  position: absolute;
+  width: 3rem;
+  height: 2rem;
+  border-radius: 0.3rem;
+  bottom: 3rem;
+  right: 1rem;
+  font-size: 0.8rem;
+  background-color: rgb(66, 190, 248);
+  color: white;
+  z-index: 20;
+  cursor: pointer;
+}
 
-  // tip-container
-  .tip-container{
-    z-index: 200;
-    position: absolute;
-    top:5rem;
-    left:3rem;
+// tip-container
+.tip-container {
+  z-index: 200;
+  position: absolute;
+  top: 5rem;
+  left: 3rem;
+}
+//
+#danmu-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 2;
+}
+
+ canvas{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
   }
+// danmu-sender
+#danmu{
+  position:absolute;
+  top: 25rem;
+  z-index: 1;
+}
 </style>
