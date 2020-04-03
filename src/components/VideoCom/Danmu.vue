@@ -11,7 +11,7 @@
     </div>
     <el-input style="margin:0 1rem" placeholder="请输入内容" v-model="input"></el-input>
     <div style="margin:.8rem 0;">
-      <el-button type="primary" @click="emitDanmu(input)">发送弹幕</el-button>
+      <el-button style="paddng:1rem 2rem" type="primary" @click="emitDanmu(input)">发送弹幕</el-button>
     </div>
   </div>
 </template>
@@ -74,6 +74,9 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 0 2rem;
+  .el-button{
+    padding: .3rem 2rem;
+  }
 }
 
 .dm-switcher {

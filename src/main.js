@@ -39,8 +39,37 @@ Vue.config.productionTip = false
   rem.src = './rem.js';
   document.body.appendChild(rem)
 })()
+
+Vue.filter('transferToTime', (v)=> {
+  if (!v) return "0:00";
+  let min = Math.floor(v / 60),
+    sec = Math.round(v % 60),
+    minStr = min + "",
+    secStr;
+  if (sec < 10) {
+    secStr = `0${sec}`;
+  } else {
+    secStr = "" + sec;
+  }
+  return `${minStr}:${secStr}`;
+})
+
+Vue.filter('alertName', (v)=> {
+ switch (v) {
+   case 'choice':
+     return '选择题'
+   case 'question':
+     return '问答题'
+   default:
+     return '错误的题目类型';
+ }
+})
+
 new Vue({
   store,
   render: h => h(App)
 }).$mount('#app')
+
+
+
 

@@ -7,7 +7,7 @@ export default new Vuex.Store({
   state: {
     dotArray: [
       {
-        time: 60,
+        time: 6,
         alertContent:{
           type:'choice',
           isAnswered:false,

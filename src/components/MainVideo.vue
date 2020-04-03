@@ -60,9 +60,9 @@
 
     <!-- 弹幕shooter -->
     <transition name="alert">
-    <danmu v-show="!isFullScreen" id="danmu":danmu="danmu" :video="$refs.video" ></danmu>
-    
+    <danmu v-show="!isFullScreen" id="danmu" :danmu="danmu" :video="$refs.video" ></danmu>
     </transition>
+    <list id="list" :timeArray="timeArray" @listItemClick="dotClickInProgress"></list>
   </div>
 </template>
 
@@ -71,7 +71,8 @@ import DotCon from "./DotCon/DotCon";
 import Choice from "./Alert/Choice";
 import Question from "./Alert/Question";
 import Tip from "./Tip/Tip";
-import Danmu from "./Danmu/Danmu";
+import Danmu from "./VideoCom/Danmu";
+import List from "./VideoCom/List"
 export default {
   name: "MainVideo",
   components: {
@@ -79,7 +80,8 @@ export default {
     Choice,
     Question,
     Tip,
-    Danmu
+    Danmu,
+    List
   },
   data() {
     return {
@@ -135,7 +137,9 @@ export default {
     for (let i = 0; i < that.$store.state.dotArray.length; i++) {
       that.timeArray.push({
         time: that.$store.state.dotArray[i].time,
-        viewed: false
+        type:that.$store.state.dotArray[i].alertContent.type,
+        viewed: false,
+
       });
     }
 
@@ -343,24 +347,7 @@ export default {
   },
 
   filters: {
-    transferToTime: function(v) {
-      if (!v) return "0:00";
-      let min = Math.floor(v / 60),
-        sec = Math.round(v % 60),
-        minStr = min + "",
-        secStr;
-      // if(min<10){
-      //   minStr = `0${min}`
-      // }else{
-      //   minStr = ''+min
-      // }
-      if (sec < 10) {
-        secStr = `0${sec}`;
-      } else {
-        secStr = "" + sec;
-      }
-      return `${minStr}:${secStr}`;
-    }
+   
   }
 };
 </script>
@@ -537,5 +524,13 @@ export default {
   position:absolute;
   top: 25rem;
   z-index: 1;
+}
+
+// list
+#list{
+  z-index: 2000;
+  position:absolute;
+  right:0;
+  top:5rem;
 }
 </style>
