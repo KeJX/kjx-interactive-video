@@ -9,7 +9,7 @@
         inactive-color="#757575"
       ></el-switch>
     </div>
-    <el-input style="margin:0 1rem" placeholder="请输入内容" v-model="input"></el-input>
+    <el-input style="margin:0 1rem;height:1.8rem;" id="danmu-input" placeholder="请输入内容" v-model="input"></el-input>
     <div style="margin:.8rem 0;">
       <el-button style="paddng:1rem 2rem" type="primary" @click="emitDanmu(input)">发送弹幕</el-button>
     </div>
@@ -66,6 +66,7 @@ export default {
 </script>
 <style lang="scss">
 .dm-container {
+  
   height: 2rem;
   width: 100%;
   box-shadow: 0 0 8px #e5e9ef;
@@ -77,6 +78,9 @@ export default {
   .el-button{
     padding: .3rem 2rem;
   }
+  .el-input__inner{
+    height:1.8rem;
+  }
 }
 
 .dm-switcher {
@@ -87,4 +91,6 @@ export default {
     height: 100% !important;
   }
 }
+
+
 </style>

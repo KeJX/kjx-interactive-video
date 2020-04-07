@@ -20,7 +20,9 @@ import store from './store'
 
 import Danmaku from 'danmaku'
 
+import Print from './plugs/print'
 
+Vue.use(Print)
 // element
 Vue.use(ElementUI);
 

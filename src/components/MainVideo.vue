@@ -521,7 +521,7 @@ export default {
   }
 // danmu-sender
 #danmu{
-  position:absolute;
+  position:relative;
   top: 25rem;
   z-index: 1;
 }

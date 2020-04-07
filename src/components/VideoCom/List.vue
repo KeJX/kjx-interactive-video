@@ -21,7 +21,8 @@
       :color="dotArrayRef[index].alertContent.isAnswered?'#0bbd87':'#E4E7ED'"
       @click.native="itemClick(timeArray[index].time)"
       >
-      {{timeArray[index].type|alertName}}
+      <div>{{timeArray[index].type|alertName}}</div>
+      <div style="color:#72767B;font-size:.5rem; padding-top:.3rem;">({{dotArrayRef[index].alertContent.title.substr(0,8)}}...)</div>
     </el-timeline-item>
   </el-timeline>
 </div>
@@ -33,7 +34,6 @@
     name:"List",
     props:{
       timeArray:Array,
-
     },
     data() {
       return {
@@ -49,6 +49,7 @@
           let tempArr 
           this.timeArray.foreach(tempArr.push({
               alertContent:{
+              title:'',
               isAnswered:false
             }
           }))
