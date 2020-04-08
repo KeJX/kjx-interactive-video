@@ -1,68 +1,50 @@
 <template>
-  <div>
-    <button @click="print">打印</button>
-    <div>
-      <!--startprint-->
-      <section style="position:fixed;top:0;z-index:1000;" ref="print" id="test">
-        1111222222
-        <div style="width:100px;height:200px;background:yellow"></div>
-      </section>
-      <!--endprint-->
-    </div>
+  <div style="position:relative;right:0;padding:0 5rem;">
+    <el-button type="primary" round style="position:relative;right:0;margin-bottom:1rem;">我要发布</el-button>
+    <el-card v-for="(item,i) in contents" :key="i" class="box-card"  style="margin-bottom:1rem;width:100%;">
+      <div slot="header" style="font-size:.8rem;">
+        <span>{{item.question}}</span>
+        <el-button style="float: right; padding: 3px 0" type="text" @click="jumpToPoint(item.time)">{{item.time|transferToTime}}</el-button>
+      </div>
+        <div class="answer" style="font-size:.5rem;">{{` ${item.answer}`}}</div>
+    </el-card>
   </div>
 </template>
 <script>
 export default {
   name: "QandA",
+  data() {
+    return {
+      contents:this.$store.state.qanda
+    }
+  },  
   methods: {
     print() {
-      function printPartial(dom, { title = document.title } = {}) {
-        if (!dom) return ;
-        let copyDom = document.createElement("span");
-        const styleDom = document.querySelectorAll("style, link, meta");
-        const titleDom = document.createElement("title");
-        titleDom.innerText = title;
-
-        copyDom.appendChild(titleDom);
-        Array.from(styleDom).forEach(item => {
-          copyDom.appendChild(item.cloneNode(true));
-        });
-        copyDom.appendChild(dom.cloneNode(true));
-
-        const htmlTemp = copyDom.innerHTML;
-        copyDom = null;
-
-        const iframeDom = document.createElement("iframe");
-        const attrObj = {
-          height: 0,
-          width: 0,
-          border: 0,
-          wmode: "Opaque"
-        };
-        const styleObj = {
-          position: "absolute",
-          top: "-999px",
-          left: "-999px"
-        };
-        Object.entries(attrObj).forEach(([key, value]) =>
-          iframeDom.setAttribute(key, value)
-        );
-        Object.entries(styleObj).forEach(
-          ([key, value]) => (iframeDom.style[key] = value)
-        );
-        document.body.insertBefore(iframeDom, document.body.children[0]);
-        const iframeWin = iframeDom.contentWindow;
-        const iframeDocs = iframeWin.document;
-        iframeDocs.write(`<!doctype html>`);
-        iframeDocs.write(htmlTemp);
-        console.log(iframeWin);
-        iframeWin.focus();
-        iframeWin.print();
-        document.body.removeChild(iframeDom);
+      var el = this.$refs.print;
+      var iframe = document.createElement("IFRAME");
+      var doc = null;
+      iframe.setAttribute(
+        "style",
+        "position:absolute;width:0px;height:0px;left:-500px;top:-500px;"
+      );
+      document.body.appendChild(iframe);
+      doc = iframe.contentWindow.document;
+      // 引入打印的专有CSS样式，www.111Cn.net根据实际修改
+      doc.write("<LINK rel='stylesheet' type='text/css' href='css/print.css'>");
+      doc.write("<div>" + el.innerHTML + "</div>");
+      doc.close();
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+      if (navigator.userAgent.indexOf("MSIE") > 0) {
+        document.body.removeChild(iframe);
       }
-        this.$print(this.$refs.print)
-      printPartial(this.$refs.print);
+    },
+    jumpToPoint(time){
+      this.$eventbus.$emit('jumpToPoint',time)
     }
   }
 };
 </script>
+
+<style lang="scss" scoped>
+</style>

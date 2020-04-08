@@ -24,12 +24,17 @@ import Qanda from "./TabsCon/QandA"
     methods: {
       handleClick(tab, event) {
         // console.log(tab, event);
-      }
+      },
+      
     }
   };
 </script>
 <style lang="scss">
     .kjx-tabs{
+      position: relative;
+        .el-tab-pane{
+          position:relative;
+        }
         .el-tabs__item{
             display:inline-flex;
             align-items: center;

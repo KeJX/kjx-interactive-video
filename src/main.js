@@ -33,7 +33,7 @@ Vue.prototype.$danmu= Danmaku
 // 引入videojs-makers (打点用)
 // import   'videojs-markers'
 
-
+Vue.prototype.$eventbus = new Vue()
 
 Vue.config.productionTip = false
 ;(function(){

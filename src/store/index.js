@@ -72,8 +72,36 @@ export default new Vuex.Store({
           // when `render` exist, `text` and `style` will be ignored.
         }
       ]
-    }
+    },
 
+    // qnada
+    qanda:[
+      {
+        time:9,
+        question:'王刚老师刚刚讲了什么?',
+        answer:'我也不知道'
+      },
+      {
+        time:9,
+        question:'王刚老师刚刚讲了什么?',
+        answer:'我也不知道'
+      },
+      {
+        time:9,
+        question:'王刚老师刚刚讲了什么?',
+        answer:'我也不知道'
+      },
+      {
+        time:9,
+        question:'王刚老师刚刚讲了什么?',
+        answer:'我也不知道'
+      },
+      {
+        time:9,
+        question:'王刚老师刚刚讲了什么?',
+        answer:'我也不知道'
+      },
+    ],
   },
   mutations: {
     reset(state){

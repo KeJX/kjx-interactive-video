@@ -213,6 +213,11 @@ export default {
         that.isShowTip = false;
       }
     });
+
+    // 监听eventbus
+    this.$eventbus.$on('jumpToPoint',(time)=>{
+      this.jumpToPoint(time)
+    })
   },
   methods: {
     // play pause button
@@ -325,10 +330,13 @@ export default {
         this.isPlay = true;
       }
     },
-    dotClickInProgress(currentTime) {
-      this.$refs.video.currentTime = currentTime;
+    jumpToPoint(time){
+       this.$refs.video.currentTime = time;
       //  this.$refs.video.play(); //防止因为结束后造成暂停状态
-      this.isPlay = true;
+      this.isPlay = false;
+    },
+    dotClickInProgress(currentTime) {
+      this.jumpToPoint(currentTime)
       // 更新 alertIndex
       let that = this;
       let index = this.timeArray.findIndex(e => {
