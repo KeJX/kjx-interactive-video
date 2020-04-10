@@ -115,12 +115,12 @@ export default new Vuex.Store({
     changeIsAnswered(state,index){
       state.dotArray[index].alertContent.isAnswered=true
     },
-    pushComments(state,input,time){
+    pushComments(state,item){
       state.danmuConfig.comments.push({
-        text: input,
+        text: item.input,
         // Specified in seconds, if not provided when using with media,
         // it will be set to `media.currentTime`. Not required in live mode.
-        time: time,
+        time: item.time,
         // When using canvas engine, Danmaku will create a <canvas> object for each comment,
         // you should pass in a CanvasRenderingContext2D object.
         // For example:
@@ -134,6 +134,17 @@ export default new Vuex.Store({
       strokeStyle: "#fff",
       lineWidth: 1.0
         }
+      })
+    },
+
+
+    // qanda
+    pushQandA(state,item){
+      console.log(item.question)
+      state.qanda.push({
+        time:item.time,
+        question:item.question,
+        answer:''
       })
     }
   },

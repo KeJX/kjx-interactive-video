@@ -59,7 +59,9 @@ export default {
       strokeStyle: "#fff",
       lineWidth: 1.0
       }})
+      this.$store.commit("pushComments",{time:time,input:input})
       this.input = ""
+
     }
   },
 };

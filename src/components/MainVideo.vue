@@ -130,7 +130,7 @@ export default {
     danmuCanvas.style.zIndex=3;
 
     let video = this.$refs.video
-
+    this.$video = video
     that.duringBar = that.$refs.duringBar
 
     // timeArray的填充
