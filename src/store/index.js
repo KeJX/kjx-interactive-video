@@ -77,28 +77,28 @@ export default new Vuex.Store({
     // qnada
     qanda:[
       {
-        time:9,
-        question:'王刚老师刚刚讲了什么?',
+        time:2,
+        question:'1王刚老师刚刚讲了什么?',
+        answer:'我也不知道'
+      },
+      {
+        time:23,
+        question:'2王刚老师刚刚讲了什么?',
+        answer:'我也不知道'
+      },
+      {
+        time:42,
+        question:'3王刚老师刚刚讲了什么?',
         answer:'我也不知道'
       },
       {
         time:9,
-        question:'王刚老师刚刚讲了什么?',
+        question:'4王刚老师刚刚讲了什么?',
         answer:'我也不知道'
       },
       {
-        time:9,
-        question:'王刚老师刚刚讲了什么?',
-        answer:'我也不知道'
-      },
-      {
-        time:9,
-        question:'王刚老师刚刚讲了什么?',
-        answer:'我也不知道'
-      },
-      {
-        time:9,
-        question:'王刚老师刚刚讲了什么?',
+        time:14,
+        question:'5王刚老师刚刚讲了什么?',
         answer:'我也不知道'
       },
     ],
