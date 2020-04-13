@@ -238,6 +238,7 @@ export default {
       this.alertIndex = index;
       // 出现提示框
       // alert('index:'+index)
+      this.$store.commit("reset");
       let info = this.$store.state.dotArray[index];
       switch (info.alertContent.type) {
         case "choice":
@@ -511,8 +512,8 @@ export default {
 .tip-container {
   z-index: 200;
   position: absolute;
-  top: 5rem;
-  left: 3rem;
+  top: 30%;
+  left: 10%;
 }
 //
 #danmu-container {

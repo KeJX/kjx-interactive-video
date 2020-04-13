@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
-    <main-video style="margin-bottom:2rem"></main-video>
-    <tabs></tabs>
+    <main-video ></main-video>
+    <tabs style="margin-top:2rem"></tabs>
   </div>
 </template>
 

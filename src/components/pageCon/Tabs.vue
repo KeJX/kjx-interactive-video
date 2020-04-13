@@ -5,16 +5,20 @@
         <qanda></qanda>
     </el-tab-pane>
     <el-tab-pane label="笔记" name="second">笔记</el-tab-pane>
-    <el-tab-pane label="数据" name="third">数据</el-tab-pane>
+    <el-tab-pane label="数据" name="third">
+      <charts></charts>
+    </el-tab-pane>
   </el-tabs>
   </div>
 </template>
 <script>
 import Qanda from "./TabsCon/QandA"
+import Charts from "./TabsCon/Charts"
   export default {
     name:"Tabs",
     components:{
-        Qanda
+        Qanda,
+        Charts
     },
     data() {
       return {

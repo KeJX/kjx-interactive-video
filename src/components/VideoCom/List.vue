@@ -19,7 +19,7 @@
       :size="'large'"
       :timestamp="item.time | transferToTime"
       :color="dotArrayRef[index].alertContent.isAnswered?'#0bbd87':'#E4E7ED'"
-      @click.native="itemClick(timeArray[index].time)"
+      @click.native="itemClick(timeArray[index].time,index)"
       >
       <div>{{timeArray[index].type|alertName}}</div>
       <div style="color:#72767B;font-size:.5rem; padding-top:.3rem;">({{dotArrayRef[index].alertContent.title.substr(0,8)}}...)</div>
@@ -58,8 +58,17 @@
       }
     },
     methods:{
-      itemClick(time){
+      itemClick(time,index){
+        if(this.dotArrayRef[index].alertContent.isAnswered)
         this.$emit('listItemClick',time)
+        else{
+           this.$message({
+          message: '观看完片段回答后才可以导航哦~',
+          type: 'warning',
+          center: true,
+          showClose: true,
+        });
+        }
       }
     }
   };

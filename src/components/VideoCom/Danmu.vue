@@ -39,7 +39,7 @@ export default {
   },
   methods: {
     emitDanmu(input){
-      // console.log(input);
+      console.log(input);
       let time = this.video.currentTime+1
       this.danmu.emit({
          text: input,
@@ -59,7 +59,7 @@ export default {
       strokeStyle: "#fff",
       lineWidth: 1.0
       }})
-      this.$store.commit("pushComments",{time:time,input:input})
+      // this.$store.commit("pushComments",{time:time,input:input})
       this.input = ""
 
     }

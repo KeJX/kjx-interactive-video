@@ -132,7 +132,8 @@ export default {
       if (this.checkList.length == 0) {
         this.$message.error({
           message: "请至少选择一个项目!",
-          center: true
+          center: true,
+          showClose: true,
         });
       } else {
         this.printDialogVisible = true;

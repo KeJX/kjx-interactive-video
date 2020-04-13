@@ -1,6 +1,10 @@
 module.exports = {
   lintOnSave: false,
-  useEslint:false
+  useEslint:false,
+  transpileDependencies: [
+    'vue-echarts',
+    'resize-detector'
+  ]
 }
 
 const px2rem = require('postcss-pxtorem')

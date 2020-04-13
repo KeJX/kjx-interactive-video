@@ -20,9 +20,8 @@ import store from './store'
 
 import Danmaku from 'danmaku'
 
-import Print from './plugs/print'
-
-Vue.use(Print)
+import ECharts from 'vue-echarts'
+Vue.component('v-chart', ECharts)
 // element
 Vue.use(ElementUI);
 
