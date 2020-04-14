@@ -21,6 +21,10 @@ import store from './store'
 import Danmaku from 'danmaku'
 
 import ECharts from 'vue-echarts'
+
+import axios from 'axios'
+import VueAxios from 'vue-axios'
+Vue.use(VueAxios, axios)
 Vue.component('v-chart', ECharts)
 // element
 Vue.use(ElementUI);

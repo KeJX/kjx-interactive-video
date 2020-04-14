@@ -1,28 +1,35 @@
-module.exports = {
-  lintOnSave: false,
-  useEslint:false,
-  transpileDependencies: [
-    'vue-echarts',
-    'resize-detector'
-  ]
+const path = require('path');
+function resolve (dir) {
+    return path.join(__dirname, dir)
 }
 
-const px2rem = require('postcss-pxtorem')
-
-const postcss = px2rem({
-  remUnit: 16   //基准大小 baseSize，需要和rem.js中相同
-})
 
 module.exports = {
-  css: {
-    loaderOptions: {
-      postcss: {
-        plugins: [
-          postcss
-        ]
-      }
-    }
-  },
 
-  lintOnSave: false
+  publicPath: './',
+    chainWebpack: (config)=>{
+        config.resolve.alias
+            .set('@', resolve('src'))
+            .set('assets',resolve('src/assets'))
+            .set('components',resolve('src/components'))
+            // .set('layout',resolve('src/layout'))
+            // .set('base',resolve('src/base'))
+            // .set('static',resolve('src/static'))
+            
+    },
+    css: {
+      sourceMap: true,
+      extract: false,
+      loaderOptions: {
+        postcss: {
+          plugins: [
+            require('postcss-pxtorem')({
+              rootValue : 16, // 换算的基数
+              // selectorBlackList  : ['weui','mu'], // 忽略转换正则匹配项
+              propList   : ['*'],
+          }),
+          ]
+        }
+      }
+    },
 }

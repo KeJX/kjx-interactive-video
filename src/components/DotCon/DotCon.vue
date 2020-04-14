@@ -11,7 +11,7 @@
   </div>
 </template>
 <script>
-import Dot from "./Dot"
+import Dot from "@/components/DotCon/Dot"
 export default {
   name:'DotCon',
   components:{

@@ -67,12 +67,12 @@
 </template>
 
 <script>
-import DotCon from "./DotCon/DotCon";
-import Choice from "./Alert/Choice";
-import Question from "./Alert/Question";
-import Tip from "./Tip/Tip";
-import Danmu from "./VideoCom/Danmu";
-import List from "./VideoCom/List"
+import DotCon from "@/components/DotCon/DotCon";
+import Choice from "@/components/Alert/Choice";
+import Question from "@/components/Alert/Question";
+import Tip from "@/components/Tip/Tip";
+import Danmu from "@/components/VideoCom/Danmu";
+import List from "@/components/VideoCom/List"
 export default {
   name: "MainVideo",
   components: {
@@ -88,6 +88,7 @@ export default {
       publicPath: process.env.BASE_URL,
       isPlay: false,
       isFullScreen: false,
+      isJumpToPoint:false,
       duration: 0,
       currentTime: 0,
       duringBar: null,
@@ -184,7 +185,9 @@ export default {
           }
         })
       ) {
-        let time = Math.round(video.currentTime);
+        if(that.isJumpToPoint)
+       {
+          let time = Math.round(video.currentTime);
         // let index = that.timeArray.findIndex(e => {
         //   return e.time == time;
         // });
@@ -194,7 +197,9 @@ export default {
         // setTimeout(()=>{
         //   that.timeArray[index].viewed = false
         // },.8)
+        that.isJumpToPoint = false
         timeIndex = -1;
+       }
       }
 
       // 监听tip
@@ -334,9 +339,12 @@ export default {
     jumpToPoint(time){
        this.$refs.video.currentTime = time;
       //  this.$refs.video.play(); //防止因为结束后造成暂停状态
+      console.log(time+"jump")
+      this.isJumpToPoint = true
       this.isPlay = false;
     },
     dotClickInProgress(currentTime) {
+      console.log(currentTime+"dotclick")
       this.jumpToPoint(currentTime)
       // 更新 alertIndex
       let that = this;
@@ -350,7 +358,8 @@ export default {
       this.$store.commit("reset");
       setTimeout(() => {
         this.timeArray[index].viewed = false;
-      }, 1);
+
+      }, .2);
       this.playButton();
     }
   },

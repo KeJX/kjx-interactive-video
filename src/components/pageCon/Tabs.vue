@@ -12,8 +12,8 @@
   </div>
 </template>
 <script>
-import Qanda from "./TabsCon/QandA"
-import Charts from "./TabsCon/Charts"
+import Qanda from "@/components/pageCon/TabsCon/QandA"
+import Charts from "@/components/pageCon/TabsCon/Charts"
   export default {
     name:"Tabs",
     components:{

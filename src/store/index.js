@@ -104,6 +104,9 @@ export default new Vuex.Store({
     ],
   },
   mutations: {
+    setState(state,data){
+      state = data
+    },
     reset(state){
       for(let key in state.showAlert){
         state.showAlert[key] = false

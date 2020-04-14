@@ -8,15 +8,32 @@
 
 <script>
 // import HelloWorld from './components/HelloWorld.vue'
-import MainVideo from './components/MainVideo'
-import Tabs from './components/pageCon/Tabs'
+import MainVideo from '@/components/MainVideo'
+import Tabs from '@/components/pageCon/Tabs'
 export default {
   name: 'app',
   components: {
     // HelloWorld
     MainVideo,
     Tabs
-  }
+  },
+  created() {
+    let that = this
+    this.axios.get('http://127.0.0.1:5500/p')
+  .then(function (response) {
+    // handle success
+    console.log(response.data);
+    that.$store.commit("setState",response.data)
+    
+  })
+  .catch(function (error) {
+    // handle error
+    console.log(error);
+  })
+  .then(function () {
+    // always executed
+  });
+  },
 }
 </script>
 
