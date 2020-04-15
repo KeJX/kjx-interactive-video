@@ -100,11 +100,19 @@ export default {
       radio: "1"
     };
   },
+  computed:{
+    qanda(){
+      return this.$store.state.qanda
+    }
+  },
   mounted(){
     this.contentsCopy()
   },
   watch: {
     radio(){
+      this.contentsCopy()
+    },
+    qanda(){
       this.contentsCopy()
     }
   },

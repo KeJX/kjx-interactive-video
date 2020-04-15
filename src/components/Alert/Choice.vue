@@ -19,25 +19,28 @@ export default {
     return {
       headList: ["A", "B", "C", "D"],
       list:null,
-      alertContent:null
     };
   },
   props: {
       index:Number
   },
+  computed:{
+    alertContent(){
+      return this.$store.state.dotArray[this.index].alertContent
+    }
+  },
   methods:{
       clickFunc(i){
-        if(this.$store.state.dotArray[this.index].alertContent.isAnswered){}
+        if(this.alertContent.isAnswered){}
         else{
           this.$store.commit("changeIsAnswered",this.index)
           this.alertContent.finalChoice = i
-           this.alertContent=this.$store.state.dotArray[this.index].alertContent
+          
         }
       }
   },
   created() {
-    this.alertContent=this.$store.state.dotArray[this.index].alertContent
-    this.list = this.$store.state.dotArray[this.index].alertContent.list
+    this.list = this.alertContent.list
   },
 };
 </script>

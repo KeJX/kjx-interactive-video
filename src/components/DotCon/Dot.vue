@@ -41,29 +41,11 @@ export default {
     watch:{
         duration:function(newVal){
             let percent = this.info.time/newVal
+            console.log(percent)
             this.$refs.dot.style = `left:${percent*100}%;`
         }
     },
-    filters: {
-    transferToTime: function(v) {
-      if (!v) return "0:00";
-      let min = Math.floor(v / 60),
-        sec = Math.round(v % 60),
-        minStr = min + "",
-        secStr;
-      // if(min<10){
-      //   minStr = `0${min}`
-      // }else{
-      //   minStr = ''+min
-      // }
-      if (sec < 10) {
-        secStr = `0${sec}`;
-      } else {
-        secStr = "" + sec;
-      }
-      return `${minStr}:${secStr}`;
-    }
-    }
+   
     
 }
 </script>

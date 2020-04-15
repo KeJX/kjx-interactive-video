@@ -1,7 +1,7 @@
 {
     "dotArray": [
         {
-          "time": 6,
+          "time": 1,
           "alertContent":{
            "type":"choice",
             "isAnswered":false,
@@ -9,16 +9,18 @@
             "list": ["香葱烧肚条", "大蒜烧肚条", "葱油猪肚", "大蒜炒肉条"],
             "rightChoice":1,
             "finalChoice":-1
-          }
+          },
+          "viewed":false
         },
         {
-          "time":56,
+          "time":100,
           "alertContent":{
             "type":"question",
             "isAnswered":false,
             "title":"回答出刚刚提到的三个注意点",
             "finalAnswer":""
-          }
+          },
+          "viewed":false
         }
         
       ],
@@ -30,7 +32,7 @@
         {
           "startTime":1,
           "endTime":9,
-          "content":"1-5"
+          "content":"1-6"
         },
         {
           "startTime":10,
@@ -43,7 +45,7 @@
       "danmuConfig":{
         "comments":[
           {
-            "text": "example",
+            "text": "exam",
             "time": 1,
             "style": {
               "font": "30px sans-serif",
@@ -64,7 +66,17 @@
          "time":2,
          "question":"1王刚老师刚刚讲了什么?",
          "answer":"我也不知道"
-        }
+        },
+        {
+          "time":12,
+          "question":"2王刚老师刚刚讲了什么?",
+          "answer":"我也不知道"
+         },
+         {
+          "time":5,
+          "question":"3王刚老师刚刚讲了什么?",
+          "answer":"我也不知道"
+         }
        
       ]
 }

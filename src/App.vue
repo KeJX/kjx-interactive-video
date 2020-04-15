@@ -17,7 +17,7 @@ export default {
     MainVideo,
     Tabs
   },
-  created() {
+  beforeCreate() {
     let that = this
     this.axios.get('http://127.0.0.1:5500/p')
   .then(function (response) {

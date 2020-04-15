@@ -20,7 +20,7 @@
         <div id="base-bar">
           <dot-con
             :duration="duration"
-            :dotArray="$store.state.dotArray"
+            :dotArray="dotArray"
             @dotClickCallback="dotClickInProgress"
           ></dot-con>
           <div id="during-bar" ref="duringBar">
@@ -40,8 +40,8 @@
       <!-- 答题弹窗 -->
     <transition name="alert">
       <div id="alert" v-if="isShowAlert">
-        <choice :index="alertIndex" v-if="this.$store.state.showAlert.choice"></choice>
-        <question :index="alertIndex" v-if="this.$store.state.showAlert.question"></question>
+        <choice :index="alertIndex" v-if="showAlert.choice"></choice>
+        <question :index="alertIndex" v-if="showAlert.question"></question>
       </div>
     </transition>
 
@@ -53,7 +53,7 @@
     <!-- 继续按钮 -->
     <transition
       name="alert"
-      v-if="isShowAlert&&$store.state.dotArray[alertIndex].alertContent.isAnswered"
+      v-if="isShowAlert&&dotArray[alertIndex].alertContent.isAnswered"
     >
       <div class="continue-button" @click="reset(alertIndex)">继续</div>
     </transition>
@@ -62,7 +62,7 @@
     <transition name="alert">
     <danmu v-show="!isFullScreen" id="danmu" :danmu="danmu" :video="$refs.video" ></danmu>
     </transition>
-    <list id="list" :timeArray="timeArray" @listItemClick="dotClickInProgress"></list>
+    <list id="list" @listItemClick="dotClickInProgress"></list>
   </div>
 </template>
 
@@ -88,14 +88,12 @@ export default {
       publicPath: process.env.BASE_URL,
       isPlay: false,
       isFullScreen: false,
-      isJumpToPoint:false,
       duration: 0,
       currentTime: 0,
       duringBar: null,
       showContinue: false,
       timeArray: [], //对视频进行打点
-      tipArray: [], //tip的时间
-      alertIndex: 0,
+      alertIndex: -1,
       // show Tip
       isShowTip: false,
       tipContent: "",
@@ -110,9 +108,19 @@ export default {
         this.$store.state.showAlert.choice ||
         this.$store.state.showAlert.question
       );
-    }
+    },
+    dotArray(){
+      return this.$store.state.dotArray
+    },
+    tipArray(){
+      return this.$store.state.tipArray
+    },
+    showAlert(){
+      return this.$store.state.showAlert
+    },
+   
+
   },
-  watch: {},
   created() {},
   mounted() {
     let that = this;
@@ -134,24 +142,10 @@ export default {
     this.$video = video
     that.duringBar = that.$refs.duringBar
 
-    // timeArray的填充
-    for (let i = 0; i < that.$store.state.dotArray.length; i++) {
-      that.timeArray.push({
-        time: that.$store.state.dotArray[i].time,
-        type:that.$store.state.dotArray[i].alertContent.type,
-        viewed: false,
-
-      });
-    }
+   
 
     //tipArray的填充
-    for (let i = 0; i < that.$store.state.tipArray.length; i++) {
-      that.tipArray.push({
-        startTime: that.$store.state.tipArray[i].startTime,
-        endTime: that.$store.state.tipArray[i].endTime,
-        content: that.$store.state.tipArray[i].content
-      });
-    }
+   
 
     video.addEventListener("loadedmetadata", () => {
       that.duration = video.duration;
@@ -173,33 +167,32 @@ export default {
       // console.log(video.currentTime)
       let timeIndex = -1;
       if (
-        that.timeArray.some(value => {
-          timeIndex = that.timeArray.findIndex(e => {
+        that.dotArray.some(value => {
+          timeIndex = that.dotArray.findIndex(e => {
             return e.time == time;
           });
           if (
             Math.abs(value.time - video.currentTime) < 0.15 &&
-            that.timeArray[timeIndex].viewed === false
+            that.dotArray[timeIndex].viewed === false
           ) {
             return true;
           }
         })
       ) {
-        if(that.isJumpToPoint)
-       {
+        
           let time = Math.round(video.currentTime);
         // let index = that.timeArray.findIndex(e => {
         //   return e.time == time;
         // });
-        that.timeArray[timeIndex].viewed = true;
+        that.dotArray[timeIndex].viewed = true;
+        console.log("timeindex"+timeIndex)
         that.pauseToShowAlert(timeIndex);
         // 恢复浏览
         // setTimeout(()=>{
         //   that.timeArray[index].viewed = false
         // },.8)
-        that.isJumpToPoint = false
         timeIndex = -1;
-       }
+       
       }
 
       // 监听tip
@@ -243,8 +236,10 @@ export default {
       this.alertIndex = index;
       // 出现提示框
       // alert('index:'+index)
+      console.log(index)
       this.$store.commit("reset");
-      let info = this.$store.state.dotArray[index];
+      let info = this.dotArray[index];
+      console.log(info)
       switch (info.alertContent.type) {
         case "choice":
           // this.$store.state.showAlert.choice = true
@@ -340,7 +335,6 @@ export default {
        this.$refs.video.currentTime = time;
       //  this.$refs.video.play(); //防止因为结束后造成暂停状态
       console.log(time+"jump")
-      this.isJumpToPoint = true
       this.isPlay = false;
     },
     dotClickInProgress(currentTime) {
@@ -348,7 +342,7 @@ export default {
       this.jumpToPoint(currentTime)
       // 更新 alertIndex
       let that = this;
-      let index = this.timeArray.findIndex(e => {
+      let index = this.dotArray.findIndex(e => {
         return e.time == currentTime;
       });
       // 暂停出现对话框
@@ -357,7 +351,7 @@ export default {
     reset(index) {
       this.$store.commit("reset");
       setTimeout(() => {
-        this.timeArray[index].viewed = false;
+        this.dotArray[index].viewed = false;
 
       }, .2);
       this.playButton();

@@ -13,15 +13,15 @@
   <el-timeline>
     <el-timeline-item
       style="cursor:pointer"
-      v-for="(item, index) in timeArray"
+      v-for="(item, index) in dotArrayRef"
       :key="index"
       :type="'promary'"
       :size="'large'"
       :timestamp="item.time | transferToTime"
       :color="dotArrayRef[index].alertContent.isAnswered?'#0bbd87':'#E4E7ED'"
-      @click.native="itemClick(timeArray[index].time,index)"
+      @click.native="itemClick(dotArrayRef[index].time,index)"
       >
-      <div>{{timeArray[index].type|alertName}}</div>
+      <div>{{dotArrayRef[index].alertContent.type|alertName}}</div>
       <div style="color:#72767B;font-size:.5rem; padding-top:.3rem;">({{dotArrayRef[index].alertContent.title.substr(0,8)}}...)</div>
     </el-timeline-item>
   </el-timeline>
@@ -32,9 +32,7 @@
 <script>
   export default {
     name:"List",
-    props:{
-      timeArray:Array,
-    },
+
     data() {
       return {
         drawer: false,
@@ -43,18 +41,18 @@
     },
     computed:{
       dotArrayRef:function(){
-        if(this.$store){
+        // if(this.$store){
           return this.$store.state.dotArray
-        }else{
-          let tempArr 
-          this.timeArray.foreach(tempArr.push({
-              alertContent:{
-              title:'',
-              isAnswered:false
-            }
-          }))
-          return tempArr
-        }
+        // }else{
+        //   let tempArr 
+        //   this.timeArray.foreach(tempArr.push({
+        //       alertContent:{
+        //       title:'',
+        //       isAnswered:false
+        //     }
+        //   }))
+        //   return tempArr
+        // }
       }
     },
     methods:{

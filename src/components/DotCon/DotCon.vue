@@ -5,7 +5,6 @@
     :info="item" 
     :duration="duration" 
     :key="i"
-    
     @dotClickInCon="dotClick"
     ></dot>
   </div>
@@ -23,6 +22,8 @@ export default {
   },
   methods:{
     dotClick(time){
+      console.log(this.dotArray)
+      console.log(time)
       this.$emit("dotClickCallback",time)
     }
   }

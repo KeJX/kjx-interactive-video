@@ -31,23 +31,24 @@ export default {
   },
   data() {
     return {
-      alertContent: {
-        // isAnswered:false
-      }
+      
     };
+  },
+  computed:{
+    alertContent(){
+      return this.$store.state.dotArray[this.index].alertContent
+    }
   },
   methods: {
     inputFunc() {
-      if (this.$store.state.dotArray[this.index].alertContent.isAnswered) {
+      if (this.alertContent.isAnswered) {
       } else {
         this.$store.commit("changeIsAnswered", this.index);
         this.alertContent.finalAnswer = this.$refs.text.value;
-        this.alertContent = this.$store.state.dotArray[this.index].alertContent;
       }
     }
   },
   created() {
-    this.alertContent = this.$store.state.dotArray[this.index].alertContent;
   }
 };
 </script>
